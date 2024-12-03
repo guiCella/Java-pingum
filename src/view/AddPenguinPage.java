@@ -286,18 +286,22 @@ public class AddPenguinPage extends javax.swing.JFrame {
             }
         });
     }
-     private void restrictToNumbers(JTextField field) {
-        field.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                // Check if the character is a digit or a control key (like backspace)
-                if (!Character.isDigit(c) && c != KeyEvent.VK_BACK_SPACE) {
-                    e.consume();  // Ignore the key press if it's not a valid number
-                }
+    private void restrictToNumbers(JTextField field) {
+    field.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            char c = e.getKeyChar();
+            // Allow digits, backspace, and a single decimal point
+            if (!Character.isDigit(c) && c != KeyEvent.VK_BACK_SPACE && c != '.') {
+                e.consume();  // Ignore the key press if it's not a valid number or decimal point
             }
-        });
-    }
+            // Allow only one decimal point in the field
+            if (c == '.' && field.getText().contains(".")) {
+                e.consume();  // Ignore the second decimal point
+            }
+        }
+    });
+}
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bntSave;
     private javax.swing.JComboBox<String> cbGender;

@@ -3,13 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package dao;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import model.Estagiario;
 import model.Funcionario;
+import model.Estagiario;
 
 public class PinguimDAO {
     public void adicionarFuncionario(Funcionario funcionario) {
@@ -90,52 +92,73 @@ public class PinguimDAO {
 }
 
 
-    public List<Funcionario> listarFuncionarios() {
-        List<Funcionario> funcionarios = new ArrayList<>();
-        String sql = "SELECT p.id, p.nome, p.telefone, f.registro, f.salario_peixes " +
-                     "FROM pinguim p JOIN funcionario f ON p.id = f.id";
+   public List<Funcionario> listarFuncionarios() {
+    List<Funcionario> funcionarios = new ArrayList<>();
+    String sql = "SELECT p.id, p.nome, p.telefone, f.registro, f.salario_peixes " +
+                 "FROM pinguim p JOIN funcionario f ON p.id = f.id";
 
-        try (Connection conn = ConexaoMySQL.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+    try (Connection conn = ConexaoMySQL.conectar();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                funcionarios.add(new Funcionario(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        0, null, null, 0, rs.getString("telefone"),
-                        rs.getInt("registro"),
-                        rs.getInt("salario_peixes")
-                ));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        while (rs.next()) {
+            // Now setting the ID properly
+            int id = rs.getInt("id");
+            String nome = rs.getString("nome");
+            int idade = rs.getInt("idade");
+            String telefone = rs.getString("telefone");
+            int registro = rs.getInt("registro");
+            int salarioPeixes = rs.getInt("salario_peixes");
+
+            Funcionario funcionario = new Funcionario(id, nome, 0, null, null, 0, telefone, registro, salarioPeixes);
+            funcionarios.add(funcionario);
         }
-
-        return funcionarios;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+
+    return funcionarios;
+}
     public List<Estagiario> listarEstagiarios() {
-        List<Estagiario> estagiarios = new ArrayList<>();
-        String sql = "SELECT p.id, p.nome, p.telefone, f.registro, f.salario_peixes " +
-                     "FROM pinguim p JOIN estagiario f ON p.id = f.id";
+    List<Estagiario> estagiarios = new ArrayList<>();
+    String sql = "SELECT p.id, p.nome, p.idade, p.telefone, f.registro, f.salario_peixes " +
+                 "FROM pinguim p JOIN estagiario f ON p.id = f.id";
 
-        try (Connection conn = ConexaoMySQL.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+    try (Connection conn = ConexaoMySQL.conectar();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                estagiarios.add(new Estagiario(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        0, null, null, 0, rs.getString("telefone"),
-                        rs.getInt("registro"),
-                        rs.getInt("salario_peixes")
-                ));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        while (rs.next()) {
+            // Retrieve 'idade' and other fields
+            int id = rs.getInt("id");
+            String nome = rs.getString("nome");
+            int idade = rs.getInt("idade");  
+            String telefone = rs.getString("telefone");
+            int registro = rs.getInt("registro");
+            int salarioPeixes = rs.getInt("salario_peixes");
+
+            Estagiario estagiario = new Estagiario(id, nome, idade, null, null, 0, telefone, registro, salarioPeixes);
+            estagiarios.add(estagiario);
         }
-
-        return estagiarios;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+
+    return estagiarios;
+}
+
+ public void deletarPingu(int id) {
+    String sqlPinguim = "DELETE FROM pinguim WHERE id = ?"; // Deleting from pinguim table
+
+    try (Connection conn = ConexaoMySQL.conectar(); 
+         PreparedStatement stmt = conn.prepareStatement(sqlPinguim)) {
+        stmt.setInt(1, id);
+        stmt.executeUpdate();  // Deleting pinguim will cascade delete related funcionario and estagiario records
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+
+    // Delete Estagiari
 }
